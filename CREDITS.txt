@@ -1,0 +1,36 @@
+PSYCH ENGINE TEAM:
+
+Shadow Mario: Main Programmer of Psych Engine
+RiverOaken: Main Artist/Animator of Psych Engine
+bb-panzu: Additional Programmer of Psych Engine
+
+------------------------------------------------------
+
+ENGINE CONTRIBUTORS:
+
+shubs: New Input System Programmer
+Sqirra: Chart Editor's Sound Waveform base
+iFlicky: Delay/Combo Menu Song Composer and Dialogue Sounds
+PolybiusProxy: .MP4 Video Loader Extension
+Keoki: Note Splash Animations
+
+------------------------------------------------------
+
+Funkin' Crew:
+ninjamuffin99: Programmer of Friday Night Funkin'
+PhantomArcade: Animator of Friday Night Funkin'
+evilsk8r: Artist of Friday Night Funkin'
+kawaisprite: Composer of Friday Night Funkin'
+
+------------------------------------------------------
+
+VS Annie Plus:
+FallenCB: Main Programmer of VS Annie Plus
+MPMoneyPlayz: Beta tester for VS Annie Plus
+
+------------------------------------------------------
+
+VS Annie OC Week:
+Atsuover: Art, Music, Chart, everything for VS Annie OC Week
+Rageminer: Tester for VS Annie OC Week
+
