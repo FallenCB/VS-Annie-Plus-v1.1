@@ -13,6 +13,7 @@ import flixel.graphics.frames.FlxAtlasFrames;
 import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.text.FlxText;
 import flixel.math.FlxMath;
+import flixel.system.FlxSound;
 import flixel.tweens.FlxEase;
 import flixel.tweens.FlxTween;
 import flixel.util.FlxColor;
@@ -26,24 +27,47 @@ using StringTools;
 class MainMenuState extends MusicBeatState
 {
 	public static var psychEngineVersion:String = '0.5'; //This is also used for Discord RPC
-	public static var vsAnnieVersion:String = '1.1'; //It didn't take me 2 weeks to get this to work...
+	public static var vsAnnieVersion:String = '1.3b'; //It didn't take me 2 weeks to get this to work...
 	public static var curSelected:Int = 0;
 
 	var menuItems:FlxTypedGroup<FlxSprite>;
 	private var camGame:FlxCamera;
 	private var camAchievement:FlxCamera;
+
+	private var char1:Character = null;
+
+	private var char2:Character = null;
+
+	private var char3:Character = null;
+
+	private var char4:Character = null;
 	
 	var optionShit:Array<String> = [
 		'story_mode',
 		'freeplay',
-		'mods', //VS Annie Plus mods compatible :()
+		'mods', //VS Annie Plus still is
 		'options'
 	];
 
 	var magenta:FlxSprite;
-	var camFollow:FlxObject;
-	var camFollowPos:FlxObject;
+	//var camFollow:FlxObject;
+	//var camFollowPos:FlxObject;
 	var debugKeys:Array<FlxKey>;
+
+	var bg:FlxSprite;
+
+	//var city:BGSprite;
+
+	var phillyCityLights:FlxTypedGroup<BGSprite>;
+	var phillyTrain:BGSprite;
+	//var blammedLightsBlack:ModchartSprite;
+	//var blammedLightsBlackTween:FlxTween;
+	var phillyCityLightsEvent:FlxTypedGroup<BGSprite>;
+	var phillyCityLightsEventTween:FlxTween;
+	var trainSound:FlxSound;
+
+	var weekMenuThing:FlxSprite;
+	var logoBL:FlxSprite;
 
 	override function create()
 	{
@@ -69,20 +93,50 @@ class MainMenuState extends MusicBeatState
 		persistentUpdate = persistentDraw = true;
 
 		var yScroll:Float = Math.max(0.25 - (0.05 * (optionShit.length - 4)), 0.1);
-		var bg:FlxSprite = new FlxSprite(-80).loadGraphic(Paths.image('menuDesat'));
+
+		//var bg = new FlxSprite('city/sky', -100, 0, 0.1, 0.1);
+		bg = new FlxSprite(-100, 0).loadGraphic(Paths.image('city/sky'));
 		bg.scrollFactor.set(0, yScroll);
-		bg.setGraphicSize(Std.int(bg.width * 1.175));
-		bg.updateHitbox();
-		//bg.flipX = true;
-		bg.screenCenter();
-		bg.antialiasing = ClientPrefs.globalAntialiasing;
-		bg.color = 0xFFF51B5C;
 		add(bg);
 
-		camFollow = new FlxObject(0, 0, 1, 1);
-		camFollowPos = new FlxObject(0, 0, 1, 1);
-		add(camFollow);
-		add(camFollowPos);
+		var city:BGSprite = new BGSprite('city/city', -10, 0, 0.3, 0.3);
+		city.setGraphicSize(Std.int(city.width * 0.85));
+		city.updateHitbox();
+		add(city);
+
+		if(!ClientPrefs.lowQuality) {
+			var streetBehind:BGSprite = new BGSprite('city/behindTrain', -40, 50);
+			add(streetBehind);
+		}
+
+		phillyTrain = new BGSprite('city/train', 2000, 360);
+		add(phillyTrain);
+
+		trainSound = new FlxSound().loadEmbedded(Paths.sound('train_passes'));
+		CoolUtil.precacheSound('train_passes');
+		FlxG.sound.list.add(trainSound);
+
+		var street:BGSprite = new BGSprite('city/street', -40, 50);
+		add(street);
+
+		weekMenuThing = new FlxSprite(0, 30).loadGraphic(Paths.image('weekmenuThingy'));
+		weekMenuThing.antialiasing = ClientPrefs.globalAntialiasing;
+		weekMenuThing.setGraphicSize(Std.int(weekMenuThing.width * 1.1));
+		add(weekMenuThing);
+
+		//logoBL = new FlxSprite(0, 0).loadGraphic(Paths.image('AnnieLogoBumpin'));
+		logoBL = new BGSprite('AnnieLogoBumpin', 0, 0, ['logo bumpin'], true);
+		logoBL.antialiasing = ClientPrefs.globalAntialiasing;
+		logoBL.setGraphicSize(Std.int(logoBL.width * 0.8));
+		//logoBL.animation.addByPrefix('bump', 'logo bumpin', 24, true);
+		//logoBL.animation.play('bump');
+		logoBL.updateHitbox();
+		//add(logoBL);
+
+		//camFollow = new FlxObject(0, 0, 1, 1);
+		//camFollowPos = new FlxObject(0, 0, 1, 1);
+		//add(camFollow);
+		//add(camFollowPos);
 
 		magenta = new FlxSprite(-80).loadGraphic(Paths.image('menuDesat'));
 		magenta.scrollFactor.set(0, yScroll);
@@ -105,10 +159,10 @@ class MainMenuState extends MusicBeatState
 
 		for (i in 0...optionShit.length)
 		{
-			var offset:Float = 108 - (Math.max(optionShit.length, 4) - 4) * 80;
+			var offset:Float = 110 - (Math.max(optionShit.length, 4) - 4) * 80;
 			var menuItem:FlxSprite = new FlxSprite(0, (i * 140)  + offset);
-			menuItem.scale.x = scale;
-			menuItem.scale.y = scale;
+			menuItem.scale.x = 0.8;
+			menuItem.scale.y = 0.8;
 			menuItem.frames = Paths.getSparrowAtlas('mainmenu/menu_' + optionShit[i]);
 			menuItem.animation.addByPrefix('idle', optionShit[i] + " basic", 24);
 			menuItem.animation.addByPrefix('selected', optionShit[i] + " white", 24);
@@ -124,10 +178,32 @@ class MainMenuState extends MusicBeatState
 			menuItem.updateHitbox();
 		}
 
-		FlxG.camera.follow(camFollowPos, null, 1);
+		//FlxG.camera.follow(camFollowPos, null, 1);
+
+		char1 = new Character(770, 180, 'bf', true);
+		char1.setGraphicSize(Std.int(char1.width * 1.0));
+		add(char1);
+		char1.visible = false;
+
+		char2 = new Character(530, -125, 'tall-annie', true);
+		char2.setGraphicSize(Std.int(char2.width * 1.1));
+		add(char2);
+		char2.visible = false;
+
+		char3 = new Character(740, 130, 'annie', true);
+		char3.setGraphicSize(Std.int(char2.width * 1.0));
+		add(char3);
+		char3.visible = false;
+
+		char4 = new Character(770, 150, 'pico', true);
+		char4.setGraphicSize(Std.int(char4.width * 0.61));
+		add(char4);
+		char4.visible = false;
 
 		var versionShit:FlxText = new FlxText(12, FlxG.height - 64, 0, "Vs Annie Plus v" + vsAnnieVersion, 12);
 		versionShit.scrollFactor.set();
+		versionShit.setFormat("VCR OSD Mono", 16, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		add(versionShit);
 		var versionShit:FlxText = new FlxText(12, FlxG.height - 44, 0, "Psych Engine v" + psychEngineVersion, 12);
 		versionShit.scrollFactor.set();
 		versionShit.setFormat("VCR OSD Mono", 16, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
@@ -138,6 +214,7 @@ class MainMenuState extends MusicBeatState
 		add(versionShit);
 
 		// NG.core.calls.event.logEvent('swag').send();
+
 
 		changeItem();
 
@@ -176,7 +253,64 @@ class MainMenuState extends MusicBeatState
 		}
 
 		var lerpVal:Float = CoolUtil.boundTo(elapsed * 7.5, 0, 1);
-		camFollowPos.setPosition(FlxMath.lerp(camFollowPos.x, camFollow.x, lerpVal), FlxMath.lerp(camFollowPos.y, camFollow.y, lerpVal));
+		//camFollowPos.setPosition(FlxMath.lerp(camFollowPos.x, camFollow.x, lerpVal), FlxMath.lerp(camFollowPos.y, camFollow.y, lerpVal));
+
+
+		if (optionShit[curSelected] == 'story_mode')
+		{
+            changeItem(-1);
+			changeItem(1);
+
+			char2.dance();
+			char2.updateHitbox();
+			char2.visible = true;
+		}
+		else
+		{
+			char2.visible = false;
+		}
+
+		if (optionShit[curSelected] == 'freeplay')
+		{
+            changeItem(-1);
+			changeItem(1);
+
+			char3.dance();
+			char3.updateHitbox();
+			char3.visible = true;
+		}
+		else
+		{
+			char3.visible = false;
+		}
+
+		if (optionShit[curSelected] == 'mods')
+		{
+            changeItem(-1);
+			changeItem(1);
+
+			char4.dance();
+			char4.updateHitbox();
+			char4.visible = true;
+		}
+		else
+		{
+			char4.visible = false;
+		}
+
+		if (optionShit[curSelected] == 'options')
+		{
+            changeItem(-1);
+			changeItem(1);
+
+			char1.dance();
+			char1.updateHitbox();
+			char1.visible = true;
+		}
+		else
+		{
+			char1.visible = false;
+		}
 
 		if (!selectedSomethin)
 		{
@@ -210,7 +344,7 @@ class MainMenuState extends MusicBeatState
 					selectedSomethin = true;
 					FlxG.sound.play(Paths.sound('confirmMenu'));
 
-					if(ClientPrefs.flashing) FlxFlicker.flicker(magenta, 1.1, 0.15, false);
+					//if(ClientPrefs.flashing) FlxFlicker.flicker(magenta, 1.1, 0.15, false);
 
 					menuItems.forEach(function(spr:FlxSprite)
 					{
@@ -265,8 +399,8 @@ class MainMenuState extends MusicBeatState
 
 		menuItems.forEach(function(spr:FlxSprite)
 		{
-			spr.screenCenter(X);
-			spr.x -= 249.9;
+			//spr.screenCenter(X);
+			spr.x = 91;
 		});
 	}
 
@@ -291,7 +425,7 @@ class MainMenuState extends MusicBeatState
 				if(menuItems.length > 4) {
 					add = menuItems.length * 8;
 				}
-				camFollow.setPosition(spr.getGraphicMidpoint().x, spr.getGraphicMidpoint().y - add);
+				//camFollow.setPosition(spr.getGraphicMidpoint().x, spr.getGraphicMidpoint().y - add);
 				spr.centerOffsets();
 			}
 		});

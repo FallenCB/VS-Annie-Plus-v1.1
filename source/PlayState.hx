@@ -711,6 +711,8 @@ class PlayState extends MusicBeatState
 				add(evilTree);
 
 				var evilSnow:BGSprite = new BGSprite('cave/evilSnow', -200, 700);
+				evilSnow.scale.x = 1.2;
+				evilSnow.scale.y = 1.2;
 				add(evilSnow);
 		}
 

@@ -22,7 +22,7 @@ class CoolUtil
 		'Hard'
 		//'Old'
 	];
-	public static var defaultDifficulty:String = 'Normal'; //The chart that has no suffix and starting difficulty on Freeplay/Story Mode
+	public static var defaultDifficulty:String = 'Hard'; //The chart that has no suffix and starting difficulty on Freeplay/Story Mode
 
 	public static var difficulties:Array<String> = [];
 
@@ -37,7 +37,7 @@ class CoolUtil
 		}
 		else
 		{
-			fileSuffix = '';
+			fileSuffix = '-hard';
 		}
 		return Paths.formatToSongPath(fileSuffix);
 	}
